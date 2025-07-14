@@ -1,0 +1,12 @@
+services:
+  homewizard-p1-exporter:
+    image: homewizard-p1-exporter:latest
+    container_name: homewizard-p1-exporter
+    environment:
+      - HOMEWIZARD_HOST=192.168.1.152  # Replace with your HomeWizard P1 Meter IP
+      - METRICS_PORT=9898
+      - POLL_INTERVAL=10
+      - LOG_LEVEL=info
+    ports:
+      - "9898:9898"
+    restart: unless-stopped

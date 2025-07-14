@@ -1,0 +1,70 @@
+.PHONY: help build run test lint fmt clean docker-build docker-run release check
+
+# Default target
+help:
+	@echo "Available targets:"
+	@echo "  make build        - Build the binary in debug mode"
+	@echo "  make release      - Build the binary in release mode"
+	@echo "  make run          - Run the exporter (requires HOMEWIZARD_HOST)"
+	@echo "  make test         - Run tests"
+	@echo "  make lint         - Run clippy linter"
+	@echo "  make fmt          - Format code"
+	@echo "  make check        - Run format check and linter"
+	@echo "  make clean        - Clean build artifacts"
+	@echo "  make docker-build - Build Docker image"
+	@echo "  make docker-run   - Run Docker container (requires HOMEWIZARD_HOST)"
+
+# Build debug binary
+build:
+	cargo build
+
+# Build release binary
+release:
+	cargo build --release
+
+# Run the exporter
+run:
+	@if [ -z "$$HOMEWIZARD_HOST" ]; then \
+		echo "Error: HOMEWIZARD_HOST environment variable is required"; \
+		echo "Usage: HOMEWIZARD_HOST=192.168.1.152 make run"; \
+		exit 1; \
+	fi
+	cargo run
+
+# Run tests
+test:
+	cargo test --verbose
+
+# Run linter
+lint:
+	cargo clippy -- -D warnings
+
+# Format code
+fmt:
+	cargo fmt
+
+# Check formatting and run linter
+check:
+	cargo fmt -- --check
+	cargo clippy -- -D warnings
+
+# Clean build artifacts
+clean:
+	cargo clean
+
+# Build Docker image
+docker-build:
+	docker build -t homewizard-p1-exporter:latest .
+
+# Run Docker container
+docker-run:
+	@if [ -z "$$HOMEWIZARD_HOST" ]; then \
+		echo "Error: HOMEWIZARD_HOST environment variable is required"; \
+		echo "Usage: HOMEWIZARD_HOST=192.168.1.152 make docker-run"; \
+		exit 1; \
+	fi
+	docker run -d --rm \
+		--name homewizard-p1-exporter \
+		-p 9898:9898 \
+		-e HOMEWIZARD_HOST=$$HOMEWIZARD_HOST \
+		homewizard-p1-exporter:latest
