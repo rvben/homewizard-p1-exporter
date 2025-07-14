@@ -3,7 +3,7 @@ mod homewizard;
 mod metrics;
 
 use anyhow::Result;
-use axum::{routing::get, Router};
+use axum::{Router, routing::get};
 use clap::Parser;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -21,7 +21,7 @@ type SharedMetrics = Arc<RwLock<String>>;
 async fn main() -> Result<()> {
     // Parse configuration
     let config = Config::parse();
-    
+
     // Initialize logging
     tracing_subscriber::registry()
         .with(
@@ -30,43 +30,40 @@ async fn main() -> Result<()> {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
-    
+
     info!("Starting HomeWizard P1 Prometheus Exporter");
     info!("HomeWizard host: {}", config.host);
     info!("Metrics port: {}", config.port);
     info!("Poll interval: {}s", config.poll_interval);
-    
+
     // Initialize metrics
     let metrics = Arc::new(Metrics::new()?);
     let shared_metrics: SharedMetrics = Arc::new(RwLock::new(String::new()));
-    
+
     // Initialize HomeWizard client
-    let client = HomeWizardClient::new(
-        config.homewizard_url(),
-        config.http_timeout_duration(),
-    )?;
-    
+    let client = HomeWizardClient::new(config.homewizard_url(), config.http_timeout_duration())?;
+
     // Start polling task
     let poll_metrics = metrics.clone();
     let poll_shared_metrics = shared_metrics.clone();
     let poll_interval = config.poll_interval_duration();
-    
+
     tokio::spawn(async move {
         let mut interval = interval(poll_interval);
         interval.tick().await; // First tick completes immediately
-        
+
         loop {
             interval.tick().await;
-            
+
             match client.fetch_data().await {
                 Ok(data) => {
                     info!("Successfully fetched data from HomeWizard");
-                    
+
                     if let Err(e) = poll_metrics.update(&data) {
                         error!("Failed to update metrics: {}", e);
                         continue;
                     }
-                    
+
                     match poll_metrics.gather() {
                         Ok(metrics_text) => {
                             let mut metrics_guard = poll_shared_metrics.write().await;
@@ -83,20 +80,20 @@ async fn main() -> Result<()> {
             }
         }
     });
-    
+
     // Initialize HTTP server
     let app = Router::new()
         .route("/metrics", get(metrics_handler))
         .route("/health", get(health_handler))
         .route("/", get(root_handler))
         .with_state(shared_metrics);
-    
+
     let addr = config.metrics_bind_address();
     info!("Starting metrics server on {}", &addr);
-    
+
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     axum::serve(listener, app).await?;
-    
+
     Ok(())
 }
 

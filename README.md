@@ -70,12 +70,16 @@ The exporter provides the following Prometheus metrics:
 | `homewizard_p1_active_current_amperes` | Gauge | Current active current in amperes |
 | `homewizard_p1_active_tariff` | Gauge | Currently active tariff (1 or 2) |
 | `homewizard_p1_gas_total_m3` | Counter | Total gas consumption in m³ |
+| `homewizard_p1_gas_timestamp` | Gauge | Timestamp of last gas meter reading |
+| `homewizard_p1_gas_meter_info{unique_id}` | Gauge | Gas meter information |
 | `homewizard_p1_wifi_strength_percent` | Gauge | WiFi signal strength percentage |
 | `homewizard_p1_voltage_sag_count_total` | Counter | Total voltage sag events |
 | `homewizard_p1_voltage_swell_count_total` | Counter | Total voltage swell events |
 | `homewizard_p1_power_failures_any_total` | Counter | Total power failures |
 | `homewizard_p1_power_failures_long_total` | Counter | Total long power failures |
 | `homewizard_p1_meter_info{meter_id,meter_model,smr_version,wifi_ssid}` | Gauge | Meter information |
+| `homewizard_p1_external_sensor_value{unique_id,type,unit}` | Gauge | External sensor value |
+| `homewizard_p1_external_sensor_timestamp{unique_id,type}` | Gauge | External sensor timestamp |
 
 ## Prometheus Configuration
 

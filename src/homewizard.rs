@@ -6,7 +6,7 @@ use thiserror::Error;
 pub enum HomeWizardError {
     #[error("HTTP request failed: {0}")]
     RequestFailed(#[from] reqwest::Error),
-    
+
     #[error("Failed to parse response: {0}")]
     ParseError(String),
 }
@@ -56,25 +56,21 @@ pub struct HomeWizardClient {
 
 impl HomeWizardClient {
     pub fn new(url: String, timeout: std::time::Duration) -> Result<Self> {
-        let client = reqwest::Client::builder()
-            .timeout(timeout)
-            .build()?;
-        
+        let client = reqwest::Client::builder().timeout(timeout).build()?;
+
         Ok(Self { client, url })
     }
 
     pub async fn fetch_data(&self) -> Result<HomeWizardData, HomeWizardError> {
-        let response = self.client
-            .get(&self.url)
-            .send()
-            .await?;
-        
+        let response = self.client.get(&self.url).send().await?;
+
         if !response.status().is_success() {
-            return Err(HomeWizardError::ParseError(
-                format!("HTTP status: {}", response.status())
-            ));
+            return Err(HomeWizardError::ParseError(format!(
+                "HTTP status: {}",
+                response.status()
+            )));
         }
-        
+
         let data = response.json::<HomeWizardData>().await?;
         Ok(data)
     }
