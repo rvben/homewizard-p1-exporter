@@ -18,7 +18,7 @@ axum = "0.8"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 
 # Prometheus metrics
-prometheus = "0.13"
+prometheus = "0.14"
 
 # JSON serialization
 serde = { version = "1.0", features = ["derive"] }
