@@ -17,16 +17,43 @@ A Rust-based Prometheus exporter for the HomeWizard P1 Meter, providing real-tim
 - Rust 1.83+ (for building from source)
 - Docker (for container deployment)
 
-## Quick Start
+## Installation
 
-### Using Docker
+### Using Docker (Recommended)
 
 ```bash
+# From Docker Hub
 docker run -d \
   --name homewizard-p1-exporter \
   -p 9898:9898 \
   -e HOMEWIZARD_HOST=192.168.1.100 \
-  homewizard-p1-exporter:latest
+  rvben/homewizard-p1-exporter:latest
+
+# From GitHub Container Registry
+docker run -d \
+  --name homewizard-p1-exporter \
+  -p 9898:9898 \
+  -e HOMEWIZARD_HOST=192.168.1.100 \
+  ghcr.io/rvben/homewizard-p1-exporter:latest
+```
+
+### Using Pre-built Binaries
+
+Download the latest release for your platform from the [releases page](https://github.com/rvben/homewizard-p1-exporter/releases).
+
+```bash
+# Example for Linux x86_64
+wget https://github.com/rvben/homewizard-p1-exporter/releases/latest/download/homewizard-p1-exporter-x86_64-linux.tar.gz
+tar -xzf homewizard-p1-exporter-x86_64-linux.tar.gz
+chmod +x homewizard-p1-exporter
+HOMEWIZARD_HOST=192.168.1.100 ./homewizard-p1-exporter
+```
+
+### Using Cargo
+
+```bash
+cargo install homewizard-p1-exporter
+HOMEWIZARD_HOST=192.168.1.100 homewizard-p1-exporter
 ```
 
 ### Building from Source
