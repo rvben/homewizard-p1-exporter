@@ -1,4 +1,4 @@
-.PHONY: help build run test lint fmt clean docker-build docker-run release check gh-secrets
+.PHONY: help build run test lint fmt clean docker-build docker-run release check gh-secrets coverage
 
 # Default target
 help:
@@ -7,6 +7,7 @@ help:
 	@echo "  make release      - Build the binary in release mode"
 	@echo "  make run          - Run the exporter (requires HOMEWIZARD_HOST)"
 	@echo "  make test         - Run tests"
+	@echo "  make coverage     - Generate code coverage report"
 	@echo "  make lint         - Run clippy linter"
 	@echo "  make fmt          - Format code"
 	@echo "  make check        - Run format check and linter"
@@ -35,6 +36,10 @@ run:
 # Run tests
 test:
 	cargo test --verbose
+
+# Generate code coverage report
+coverage:
+	cargo tarpaulin --verbose --all-features --workspace --timeout 120 --out html
 
 # Run linter
 lint:
