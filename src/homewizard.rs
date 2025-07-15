@@ -356,9 +356,11 @@ mod tests {
 
         Mock::given(method("GET"))
             .and(path("/api/v1/data"))
-            .respond_with(ResponseTemplate::new(200).set_body_json(
-                serde_json::from_str::<serde_json::Value>(json_response).unwrap(),
-            ))
+            .respond_with(
+                ResponseTemplate::new(200).set_body_json(
+                    serde_json::from_str::<serde_json::Value>(json_response).unwrap(),
+                ),
+            )
             .mount(&mock_server)
             .await;
 
