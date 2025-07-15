@@ -1,8 +1,5 @@
 # Build stage
-FROM rust:1.88.0-alpine AS builder
-
-# Install build dependencies
-RUN apk add --no-cache musl-dev
+FROM rust:1.88 AS builder
 
 WORKDIR /app
 
@@ -16,7 +13,7 @@ COPY src ./src
 RUN cargo build --release
 
 # Runtime stage
-FROM alpine:3.21
+FROM alpine:3.22
 
 # Install runtime dependencies
 RUN apk add --no-cache ca-certificates
