@@ -1,21 +1,42 @@
 # HomeWizard P1 Prometheus Exporter
 
+[![CI](https://github.com/rvben/homewizard-p1-exporter/actions/workflows/ci.yml/badge.svg)](https://github.com/rvben/homewizard-p1-exporter/actions/workflows/ci.yml)
+[![Release](https://github.com/rvben/homewizard-p1-exporter/actions/workflows/release.yml/badge.svg)](https://github.com/rvben/homewizard-p1-exporter/actions/workflows/release.yml)
+[![Crates.io](https://img.shields.io/crates/v/homewizard-p1-exporter.svg)](https://crates.io/crates/homewizard-p1-exporter)
+[![Docker Pulls](https://img.shields.io/docker/pulls/rvben/homewizard-p1-exporter)](https://hub.docker.com/r/rvben/homewizard-p1-exporter)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/rust-1.88%2B-blue.svg)](https://www.rust-lang.org)
+
 A Rust-based Prometheus exporter for the HomeWizard P1 Meter, providing real-time electricity and gas consumption metrics.
 
 ## Features
 
-- Real-time power consumption/production monitoring
-- Gas consumption tracking
-- Tariff-based metrics (T1/T2)
-- Power quality metrics (voltage sags/swells, power failures)
-- WiFi signal strength monitoring
-- Lightweight and efficient Rust implementation
+- 🚀 **High Performance** - Lightweight and efficient Rust implementation
+- 📊 **Real-time Monitoring** - Power consumption/production metrics updated every 10 seconds
+- ⚡ **Power Quality Tracking** - Voltage sags/swells and power failure monitoring
+- 🔥 **Gas Consumption** - Integrated gas meter reading support
+- 💰 **Tariff Support** - Separate metrics for peak (T1) and off-peak (T2) tariffs
+- 📡 **Network Monitoring** - WiFi signal strength tracking
+- 🐳 **Docker Ready** - Multi-platform images for easy deployment
+- ✅ **Production Ready** - Comprehensive test coverage and error handling
 
 ## Prerequisites
 
 - HomeWizard P1 Meter with local API enabled
-- Rust 1.83+ (for building from source)
+- Rust 1.88+ (for building from source)
 - Docker (for container deployment)
+
+## Quick Start
+
+```bash
+# Using Docker
+docker run -d -p 9898:9898 -e HOMEWIZARD_HOST=192.168.1.100 rvben/homewizard-p1-exporter:latest
+
+# Or using pre-built binary
+wget https://github.com/rvben/homewizard-p1-exporter/releases/latest/download/homewizard-p1-exporter-$(uname -m)-linux.tar.gz
+tar -xzf homewizard-p1-exporter-*.tar.gz
+HOMEWIZARD_HOST=192.168.1.100 ./homewizard-p1-exporter
+```
 
 ## Installation
 
