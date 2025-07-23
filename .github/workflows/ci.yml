@@ -52,7 +52,7 @@ jobs:
         components: rustfmt, clippy
     
     - name: Build release binary
-      run: make release
+      run: make build-release
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
