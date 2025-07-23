@@ -1,6 +1,6 @@
 [package]
 name = "homewizard-p1-exporter"
-version = "0.1.5"
+version = "0.1.7"
 edition = "2024"
 authors = ["Ruben J. Jongejan <ruben.jongejan@gmail.com>"]
 description = "Prometheus exporter for HomeWizard P1 electricity meter"
