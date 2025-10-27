@@ -55,7 +55,7 @@ jobs:
       run: make build-release
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: homewizard-p1-exporter
         path: target/release/homewizard-p1-exporter
