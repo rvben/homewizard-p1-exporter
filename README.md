@@ -115,14 +115,26 @@ The exporter provides the following Prometheus metrics:
 | `homewizard_p1_power_export_tariff_kwh{tariff}` | Counter | Power exported per tariff (1/2) |
 | `homewizard_p1_active_power_watts` | Gauge | Current active power in watts |
 | `homewizard_p1_active_power_l1_watts` | Gauge | Current active power L1 in watts |
+| `homewizard_p1_active_power_l2_watts` | Gauge | Current active power L2 in watts |
+| `homewizard_p1_active_power_l3_watts` | Gauge | Current active power L3 in watts |
+| `homewizard_p1_active_voltage_l1_volts` | Gauge | Current active voltage L1 in volts |
+| `homewizard_p1_active_voltage_l2_volts` | Gauge | Current active voltage L2 in volts |
+| `homewizard_p1_active_voltage_l3_volts` | Gauge | Current active voltage L3 in volts |
 | `homewizard_p1_active_current_amperes` | Gauge | Current active current in amperes |
+| `homewizard_p1_active_current_l1_amperes` | Gauge | Current active current L1 in amperes |
+| `homewizard_p1_active_current_l2_amperes` | Gauge | Current active current L2 in amperes |
+| `homewizard_p1_active_current_l3_amperes` | Gauge | Current active current L3 in amperes |
 | `homewizard_p1_active_tariff` | Gauge | Currently active tariff (1 or 2) |
 | `homewizard_p1_gas_total_m3` | Counter | Total gas consumption in m³ |
 | `homewizard_p1_gas_timestamp` | Gauge | Timestamp of last gas meter reading |
 | `homewizard_p1_gas_meter_info{unique_id}` | Gauge | Gas meter information |
 | `homewizard_p1_wifi_strength_percent` | Gauge | WiFi signal strength percentage |
-| `homewizard_p1_voltage_sag_count_total` | Counter | Total voltage sag events |
-| `homewizard_p1_voltage_swell_count_total` | Counter | Total voltage swell events |
+| `homewizard_p1_voltage_sag_l1_count_total` | Counter | Total voltage sag events |
+| `homewizard_p1_voltage_sag_l2_count_total` | Counter | Total voltage sag events |
+| `homewizard_p1_voltage_sag_l3_count_total` | Counter | Total voltage sag events |
+| `homewizard_p1_voltage_swell_l1_count_total` | Counter | Total voltage swell events |
+| `homewizard_p1_voltage_swell_l2_count_total` | Counter | Total voltage swell events |
+| `homewizard_p1_voltage_swell_l3_count_total` | Counter | Total voltage swell events |
 | `homewizard_p1_power_failures_any_total` | Counter | Total power failures |
 | `homewizard_p1_power_failures_long_total` | Counter | Total long power failures |
 | `homewizard_p1_meter_info{meter_id,meter_model,smr_version,wifi_ssid}` | Gauge | Meter information |

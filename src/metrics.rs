@@ -14,8 +14,15 @@ pub struct Metrics {
     // Current power metrics
     active_power: Gauge,
     active_power_l1: Gauge,
+    active_power_l2: Gauge,
+    active_power_l3: Gauge,
+    active_voltage_l1: Gauge,
+    active_voltage_l2: Gauge,
+    active_voltage_l3: Gauge,
     active_current: Gauge,
     active_current_l1: Gauge,
+    active_current_l2: Gauge,
+    active_current_l3: Gauge,
     active_tariff: Gauge,
 
     // Gas metrics
@@ -27,8 +34,12 @@ pub struct Metrics {
     wifi_strength: Gauge,
 
     // Power quality metrics
-    voltage_sag_count: Counter,
-    voltage_swell_count: Counter,
+    voltage_sag_l1_count: Counter,
+    voltage_sag_l2_count: Counter,
+    voltage_sag_l3_count: Counter,
+    voltage_swell_l1_count: Counter,
+    voltage_swell_l2_count: Counter,
+    voltage_swell_l3_count: Counter,
     power_failures_any: Counter,
     power_failures_long: Counter,
 
@@ -91,6 +102,36 @@ impl Metrics {
         ))?;
         registry.register(Box::new(active_power_l1.clone()))?;
 
+        let active_power_l2 = Gauge::with_opts(Opts::new(
+            "homewizard_p1_active_power_l2_watts",
+            "Current active power L2 in watts",
+        ))?;
+        registry.register(Box::new(active_power_l2.clone()))?;
+
+        let active_power_l3 = Gauge::with_opts(Opts::new(
+            "homewizard_p1_active_power_l3_watts",
+            "Current active power L3 in watts",
+        ))?;
+        registry.register(Box::new(active_power_l3.clone()))?;
+
+        let active_voltage_l1 = Gauge::with_opts(Opts::new(
+            "homewizard_p1_active_voltage_l1_volts",
+            "Current active voltage L1 in volts",
+        ))?;
+        registry.register(Box::new(active_voltage_l1.clone()))?;
+
+        let active_voltage_l2 = Gauge::with_opts(Opts::new(
+            "homewizard_p1_active_voltage_l2_volts",
+            "Current active voltage L2 in volts",
+        ))?;
+        registry.register(Box::new(active_voltage_l2.clone()))?;
+
+        let active_voltage_l3 = Gauge::with_opts(Opts::new(
+            "homewizard_p1_active_voltage_l3_volts",
+            "Current active voltage L3 in volts",
+        ))?;
+        registry.register(Box::new(active_voltage_l3.clone()))?;
+
         let active_current = Gauge::with_opts(Opts::new(
             "homewizard_p1_active_current_amperes",
             "Current active current in amperes",
@@ -102,6 +143,18 @@ impl Metrics {
             "Current active current L1 in amperes",
         ))?;
         registry.register(Box::new(active_current_l1.clone()))?;
+
+        let active_current_l2 = Gauge::with_opts(Opts::new(
+            "homewizard_p1_active_current_l2_amperes",
+            "Current active current L2 in amperes",
+        ))?;
+        registry.register(Box::new(active_current_l2.clone()))?;
+
+        let active_current_l3 = Gauge::with_opts(Opts::new(
+            "homewizard_p1_active_current_l3_amperes",
+            "Current active current L3 in amperes",
+        ))?;
+        registry.register(Box::new(active_current_l3.clone()))?;
 
         let active_tariff = Gauge::with_opts(Opts::new(
             "homewizard_p1_active_tariff",
@@ -135,18 +188,41 @@ impl Metrics {
         ))?;
         registry.register(Box::new(wifi_strength.clone()))?;
 
-        // Power quality metrics
-        let voltage_sag_count = Counter::with_opts(Opts::new(
-            "homewizard_p1_voltage_sag_count_total",
-            "Total voltage sag events",
+        let voltage_sag_l1_count = Counter::with_opts(Opts::new(
+            "homewizard_p1_voltage_sag_l1_count_total",
+            "Total voltage sag L1 events",
         ))?;
-        registry.register(Box::new(voltage_sag_count.clone()))?;
+        registry.register(Box::new(voltage_sag_l1_count.clone()))?;
 
-        let voltage_swell_count = Counter::with_opts(Opts::new(
-            "homewizard_p1_voltage_swell_count_total",
-            "Total voltage swell events",
+        let voltage_sag_l2_count = Counter::with_opts(Opts::new(
+            "homewizard_p1_voltage_sag_l2_count_total",
+            "Total voltage sag L2 events",
         ))?;
-        registry.register(Box::new(voltage_swell_count.clone()))?;
+        registry.register(Box::new(voltage_sag_l2_count.clone()))?;
+
+        let voltage_sag_l3_count = Counter::with_opts(Opts::new(
+            "homewizard_p1_voltage_sag_l3_count_total",
+            "Total voltage sag L3 events",
+        ))?;
+        registry.register(Box::new(voltage_sag_l3_count.clone()))?;
+
+        let voltage_swell_l1_count = Counter::with_opts(Opts::new(
+            "homewizard_p1_voltage_swell_l1_count_total",
+            "Total voltage swell L1 events",
+        ))?;
+        registry.register(Box::new(voltage_swell_l1_count.clone()))?;
+
+        let voltage_swell_l2_count = Counter::with_opts(Opts::new(
+            "homewizard_p1_voltage_swell_l2_count_total",
+            "Total voltage swell L2 events",
+        ))?;
+        registry.register(Box::new(voltage_swell_l2_count.clone()))?;
+
+        let voltage_swell_l3_count = Counter::with_opts(Opts::new(
+            "homewizard_p1_voltage_swell_l3_count_total",
+            "Total voltage swell L3 events",
+        ))?;
+        registry.register(Box::new(voltage_swell_l3_count.clone()))?;
 
         let power_failures_any = Counter::with_opts(Opts::new(
             "homewizard_p1_power_failures_any_total",
@@ -193,15 +269,26 @@ impl Metrics {
             power_export_tariff,
             active_power,
             active_power_l1,
+            active_power_l2,
+            active_power_l3,
+            active_voltage_l1,
+            active_voltage_l2,
+            active_voltage_l3,
             active_current,
             active_current_l1,
+            active_current_l2,
+            active_current_l3,
             active_tariff,
             gas_total,
             gas_timestamp,
             gas_meter_info,
             wifi_strength,
-            voltage_sag_count,
-            voltage_swell_count,
+            voltage_sag_l1_count,
+            voltage_sag_l2_count,
+            voltage_sag_l3_count,
+            voltage_swell_l1_count,
+            voltage_swell_l2_count,
+            voltage_swell_l3_count,
             power_failures_any,
             power_failures_long,
             meter_info,
@@ -239,8 +326,15 @@ impl Metrics {
         // Update current power metrics
         self.active_power.set(data.active_power_w);
         self.active_power_l1.set(data.active_power_l1_w);
+        self.active_power_l2.set(data.active_power_l2_w);
+        self.active_power_l3.set(data.active_power_l3_w);
+        self.active_voltage_l1.set(data.active_voltage_l1_v);
+        self.active_voltage_l2.set(data.active_voltage_l2_v);
+        self.active_voltage_l3.set(data.active_voltage_l3_v);
         self.active_current.set(data.active_current_a);
         self.active_current_l1.set(data.active_current_l1_a);
+        self.active_current_l2.set(data.active_current_l2_a);
+        self.active_current_l3.set(data.active_current_l3_a);
         self.active_tariff.set(data.active_tariff as f64);
 
         // Update gas metrics
@@ -260,11 +354,26 @@ impl Metrics {
         self.wifi_strength.set(data.wifi_strength);
 
         // Update power quality metrics
-        self.voltage_sag_count.reset();
-        self.voltage_sag_count.inc_by(data.voltage_sag_l1_count);
+        self.voltage_sag_l1_count.reset();
+        self.voltage_sag_l1_count.inc_by(data.voltage_sag_l1_count);
 
-        self.voltage_swell_count.reset();
-        self.voltage_swell_count.inc_by(data.voltage_swell_l1_count);
+        self.voltage_sag_l2_count.reset();
+        self.voltage_sag_l2_count.inc_by(data.voltage_sag_l2_count);
+
+        self.voltage_sag_l3_count.reset();
+        self.voltage_sag_l3_count.inc_by(data.voltage_sag_l3_count);
+
+        self.voltage_swell_l1_count.reset();
+        self.voltage_swell_l1_count
+            .inc_by(data.voltage_swell_l1_count);
+
+        self.voltage_swell_l2_count.reset();
+        self.voltage_swell_l2_count
+            .inc_by(data.voltage_swell_l2_count);
+
+        self.voltage_swell_l3_count.reset();
+        self.voltage_swell_l3_count
+            .inc_by(data.voltage_swell_l3_count);
 
         self.power_failures_any.reset();
         self.power_failures_any.inc_by(data.any_power_fail_count);
@@ -328,11 +437,22 @@ mod tests {
             total_power_export_t1_kwh: 60.789,
             total_power_export_t2_kwh: 28.223,
             active_power_w: 1500.0,
-            active_power_l1_w: 1500.0,
+            active_power_l1_w: 750.0,
+            active_power_l2_w: 500.0,
+            active_power_l3_w: 250.0,
+            active_voltage_l1_v: 230.0,
+            active_voltage_l2_v: 230.0,
+            active_voltage_l3_v: 230.0,
             active_current_a: 6.8,
-            active_current_l1_a: 6.8,
+            active_current_l1_a: 4.2,
+            active_current_l2_a: 1.3,
+            active_current_l3_a: 1.8,
             voltage_sag_l1_count: 2.0,
+            voltage_sag_l2_count: 2.0,
+            voltage_sag_l3_count: 2.0,
             voltage_swell_l1_count: 1.0,
+            voltage_swell_l2_count: 1.0,
+            voltage_swell_l3_count: 1.0,
             any_power_fail_count: 5.0,
             long_power_fail_count: 0.0,
             total_gas_m3: 567.890,
@@ -425,9 +545,16 @@ mod tests {
         let output = metrics.gather().unwrap();
 
         assert!(output.contains("homewizard_p1_active_power_watts 1500"));
-        assert!(output.contains("homewizard_p1_active_power_l1_watts 1500"));
+        assert!(output.contains("homewizard_p1_active_power_l1_watts 750"));
+        assert!(output.contains("homewizard_p1_active_power_l2_watts 500"));
+        assert!(output.contains("homewizard_p1_active_power_l3_watts 250"));
+        assert!(output.contains("homewizard_p1_active_voltage_l1_volts 230"));
+        assert!(output.contains("homewizard_p1_active_voltage_l2_volts 230"));
+        assert!(output.contains("homewizard_p1_active_voltage_l3_volts 230"));
         assert!(output.contains("homewizard_p1_active_current_amperes 6.8"));
-        assert!(output.contains("homewizard_p1_active_current_l1_amperes 6.8"));
+        assert!(output.contains("homewizard_p1_active_current_l1_amperes 4.2"));
+        assert!(output.contains("homewizard_p1_active_current_l2_amperes 1.3"));
+        assert!(output.contains("homewizard_p1_active_current_l3_amperes 1.8"));
         assert!(output.contains("homewizard_p1_active_tariff 1"));
     }
 
@@ -463,8 +590,12 @@ mod tests {
         metrics.update(&data).unwrap();
         let output = metrics.gather().unwrap();
 
-        assert!(output.contains("homewizard_p1_voltage_sag_count_total 2"));
-        assert!(output.contains("homewizard_p1_voltage_swell_count_total 1"));
+        assert!(output.contains("homewizard_p1_voltage_sag_l1_count_total 2"));
+        assert!(output.contains("homewizard_p1_voltage_sag_l2_count_total 2"));
+        assert!(output.contains("homewizard_p1_voltage_sag_l3_count_total 2"));
+        assert!(output.contains("homewizard_p1_voltage_swell_l1_count_total 1"));
+        assert!(output.contains("homewizard_p1_voltage_swell_l2_count_total 1"));
+        assert!(output.contains("homewizard_p1_voltage_swell_l3_count_total 1"));
         assert!(output.contains("homewizard_p1_power_failures_any_total 5"));
         assert!(output.contains("homewizard_p1_power_failures_long_total 0"));
     }
