@@ -129,12 +129,12 @@ The exporter provides the following Prometheus metrics:
 | `homewizard_p1_gas_timestamp` | Gauge | Timestamp of last gas meter reading |
 | `homewizard_p1_gas_meter_info{unique_id}` | Gauge | Gas meter information |
 | `homewizard_p1_wifi_strength_percent` | Gauge | WiFi signal strength percentage |
-| `homewizard_p1_voltage_sag_l1_count_total` | Counter | Total voltage sag events |
-| `homewizard_p1_voltage_sag_l2_count_total` | Counter | Total voltage sag events |
-| `homewizard_p1_voltage_sag_l3_count_total` | Counter | Total voltage sag events |
-| `homewizard_p1_voltage_swell_l1_count_total` | Counter | Total voltage swell events |
-| `homewizard_p1_voltage_swell_l2_count_total` | Counter | Total voltage swell events |
-| `homewizard_p1_voltage_swell_l3_count_total` | Counter | Total voltage swell events |
+| `homewizard_p1_voltage_sag_l1_count_total` | Counter | Total voltage sag events on L1 |
+| `homewizard_p1_voltage_sag_l2_count_total` | Counter | Total voltage sag events on L2 |
+| `homewizard_p1_voltage_sag_l3_count_total` | Counter | Total voltage sag events on L3 |
+| `homewizard_p1_voltage_swell_l1_count_total` | Counter | Total voltage swell events on L1 |
+| `homewizard_p1_voltage_swell_l2_count_total` | Counter | Total voltage swell events on L2 |
+| `homewizard_p1_voltage_swell_l3_count_total` | Counter | Total voltage swell events on L3 |
 | `homewizard_p1_power_failures_any_total` | Counter | Total power failures |
 | `homewizard_p1_power_failures_long_total` | Counter | Total long power failures |
 | `homewizard_p1_meter_info{meter_id,meter_model,smr_version,wifi_ssid}` | Gauge | Meter information |

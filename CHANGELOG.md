@@ -7,10 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.6] - 2026-04-30
-
 ### Added
-- Support for 3phases
+- 3-phase metrics: `homewizard_p1_active_power_l{2,3}_watts`, `homewizard_p1_active_voltage_l{1,2,3}_volts`, `homewizard_p1_active_current_l{2,3}_amperes`, `homewizard_p1_voltage_sag_l{2,3}_count_total`, `homewizard_p1_voltage_swell_l{2,3}_count_total`
+- Tolerant deserialization: missing or `null` numeric/optional fields decode as zero/empty defaults instead of failing the whole response
+- Parse errors now include the response body for easier diagnosis
+
+### Changed (breaking)
+- Renamed `homewizard_p1_voltage_sag_count_total` → `homewizard_p1_voltage_sag_l1_count_total`
+- Renamed `homewizard_p1_voltage_swell_count_total` → `homewizard_p1_voltage_swell_l1_count_total`
+
+  The previous names misleadingly implied an aggregate; they were always sourced from the L1 field. Single-phase users should switch to the L1 variant. To get an aggregate across phases, use `sum(homewizard_p1_voltage_sag_lN_count_total)`.
 
 ## [0.1.5] - 2025-01-23
 

@@ -301,6 +301,113 @@ mod tests {
     }
 
     #[test]
+    fn test_homewizard_data_deserialization_with_null_fields() {
+        // Some HomeWizard P1 firmwares return `null` for fields the meter
+        // does not expose. These should decode as defaults instead of failing.
+        let json_data = r#"
+        {
+            "wifi_ssid": "Test",
+            "wifi_strength": 50.0,
+            "smr_version": 40,
+            "meter_model": "Test Model",
+            "unique_id": "test123",
+            "active_tariff": 1,
+            "total_power_import_kwh": 100.0,
+            "total_power_import_t1_kwh": 60.0,
+            "total_power_import_t2_kwh": 40.0,
+            "total_power_export_kwh": 10.0,
+            "total_power_export_t1_kwh": 6.0,
+            "total_power_export_t2_kwh": 4.0,
+            "active_power_w": 500.0,
+            "active_power_l1_w": 500.0,
+            "active_power_l2_w": null,
+            "active_power_l3_w": null,
+            "active_voltage_l1_v": null,
+            "active_voltage_l2_v": null,
+            "active_voltage_l3_v": null,
+            "active_current_a": 2.3,
+            "active_current_l1_a": 2.3,
+            "active_current_l2_a": null,
+            "active_current_l3_a": null,
+            "voltage_sag_l1_count": 0.0,
+            "voltage_sag_l2_count": null,
+            "voltage_sag_l3_count": null,
+            "voltage_swell_l1_count": 0.0,
+            "voltage_swell_l2_count": null,
+            "voltage_swell_l3_count": null,
+            "any_power_fail_count": null,
+            "long_power_fail_count": null,
+            "total_gas_m3": null,
+            "gas_timestamp": null,
+            "gas_unique_id": null,
+            "external": null
+        }
+        "#;
+
+        let data: HomeWizardData =
+            serde_json::from_str(json_data).expect("null fields must decode as defaults");
+        assert_eq!(data.active_power_l2_w, 0.0);
+        assert_eq!(data.active_power_l3_w, 0.0);
+        assert_eq!(data.active_voltage_l1_v, 0.0);
+        assert_eq!(data.active_current_l2_a, 0.0);
+        assert_eq!(data.voltage_sag_l2_count, 0.0);
+        assert_eq!(data.voltage_swell_l3_count, 0.0);
+        assert_eq!(data.any_power_fail_count, 0.0);
+        assert_eq!(data.total_gas_m3, 0.0);
+        assert_eq!(data.gas_timestamp, 0);
+        assert_eq!(data.gas_unique_id, "");
+        assert!(data.external.is_empty());
+    }
+
+    #[test]
+    fn test_homewizard_data_deserialization_single_phase_meter() {
+        // Single-phase meters omit L2/L3 and voltage fields entirely.
+        // The struct must decode them as zero defaults.
+        let json_data = r#"
+        {
+            "wifi_ssid": "Test",
+            "wifi_strength": 50.0,
+            "smr_version": 40,
+            "meter_model": "Test Model",
+            "unique_id": "test123",
+            "active_tariff": 1,
+            "total_power_import_kwh": 100.0,
+            "total_power_import_t1_kwh": 60.0,
+            "total_power_import_t2_kwh": 40.0,
+            "total_power_export_kwh": 10.0,
+            "total_power_export_t1_kwh": 6.0,
+            "total_power_export_t2_kwh": 4.0,
+            "active_power_w": 500.0,
+            "active_power_l1_w": 500.0,
+            "active_current_a": 2.3,
+            "active_current_l1_a": 2.3,
+            "voltage_sag_l1_count": 3.0,
+            "voltage_swell_l1_count": 1.0,
+            "any_power_fail_count": 2.0,
+            "long_power_fail_count": 0.0
+        }
+        "#;
+
+        let data: HomeWizardData = serde_json::from_str(json_data)
+            .expect("payload missing L2/L3 and gas fields must decode as defaults");
+        assert_eq!(data.active_power_l1_w, 500.0);
+        assert_eq!(data.active_power_l2_w, 0.0);
+        assert_eq!(data.active_power_l3_w, 0.0);
+        assert_eq!(data.active_voltage_l1_v, 0.0);
+        assert_eq!(data.active_voltage_l2_v, 0.0);
+        assert_eq!(data.active_voltage_l3_v, 0.0);
+        assert_eq!(data.active_current_l2_a, 0.0);
+        assert_eq!(data.active_current_l3_a, 0.0);
+        assert_eq!(data.voltage_sag_l1_count, 3.0);
+        assert_eq!(data.voltage_sag_l2_count, 0.0);
+        assert_eq!(data.voltage_sag_l3_count, 0.0);
+        assert_eq!(data.voltage_swell_l2_count, 0.0);
+        assert_eq!(data.total_gas_m3, 0.0);
+        assert_eq!(data.gas_unique_id, "");
+        assert!(data.external.is_empty());
+    }
+
+    #[test]
     fn test_external_sensor_deserialization() {
         let json_data = r#"
         {
