@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [Unreleased]
+
+## [0.2.0](https://github.com/rvben/homewizard-p1-exporter/compare/v0.1.5...v0.2.0) - 2026-04-30
 
 ### Added
 - 3-phase metrics: `homewizard_p1_active_power_l{2,3}_watts`, `homewizard_p1_active_voltage_l{1,2,3}_volts`, `homewizard_p1_active_current_l{2,3}_amperes`, `homewizard_p1_voltage_sag_l{2,3}_count_total`, `homewizard_p1_voltage_swell_l{2,3}_count_total`
@@ -17,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed `homewizard_p1_voltage_swell_count_total` → `homewizard_p1_voltage_swell_l1_count_total`
 
   The previous names misleadingly implied an aggregate; they were always sourced from the L1 field. Single-phase users should switch to the L1 variant. To get an aggregate across phases, use `sum(homewizard_p1_voltage_sag_lN_count_total)`.
+
+Thanks @dalax01 for the 3-phase contribution.
 
 ## [0.1.5] - 2025-01-23
 
