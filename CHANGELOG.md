@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-04-30
+
+### Added
+- Support for 3phases
+
 ## [0.1.5] - 2025-01-23
 
 ### Added

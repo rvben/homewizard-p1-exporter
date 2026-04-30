@@ -1,6 +1,14 @@
 use anyhow::Result;
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 use thiserror::Error;
+
+fn null_as_default<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+where
+    T: Default + Deserialize<'de>,
+    D: Deserializer<'de>,
+{
+    Ok(Option::deserialize(deserializer)?.unwrap_or_default())
+}
 
 #[derive(Error, Debug)]
 pub enum HomeWizardError {
@@ -25,17 +33,51 @@ pub struct HomeWizardData {
     pub total_power_export_kwh: f64,
     pub total_power_export_t1_kwh: f64,
     pub total_power_export_t2_kwh: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub active_power_w: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub active_power_l1_w: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub active_power_l2_w: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub active_power_l3_w: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub active_voltage_l1_v: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub active_voltage_l2_v: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub active_voltage_l3_v: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub active_current_a: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub active_current_l1_a: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub active_current_l2_a: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub active_current_l3_a: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub voltage_sag_l1_count: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub voltage_sag_l2_count: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub voltage_sag_l3_count: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub voltage_swell_l1_count: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub voltage_swell_l2_count: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
+    pub voltage_swell_l3_count: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub any_power_fail_count: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub long_power_fail_count: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub total_gas_m3: f64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub gas_timestamp: i64,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub gas_unique_id: String,
+    #[serde(default, deserialize_with = "null_as_default")]
     pub external: Vec<ExternalSensor>,
 }
 
@@ -71,8 +113,10 @@ impl HomeWizardClient {
             )));
         }
 
-        let data = response.json::<HomeWizardData>().await?;
-        Ok(data)
+        let body = response.text().await?;
+        serde_json::from_str::<HomeWizardData>(&body).map_err(|e| {
+            HomeWizardError::ParseError(format!("JSON decode error: {e}\nResponse body: {body}"))
+        })
     }
 }
 
@@ -124,11 +168,22 @@ mod tests {
             "total_power_export_t1_kwh": 60.789,
             "total_power_export_t2_kwh": 28.223,
             "active_power_w": 1500.0,
-            "active_power_l1_w": 1500.0,
+            "active_power_l1_w": 750.0,
+            "active_power_l2_w": 500.0,
+            "active_power_l3_w": 250.0,
+            "active_voltage_l1_v": 230.0,
+            "active_voltage_l2_v": 230.0,
+            "active_voltage_l3_v": 230.0,
             "active_current_a": 6.8,
-            "active_current_l1_a": 6.8,
+            "active_current_l1_a": 4.0,
+            "active_current_l2_a": 1.0,
+            "active_current_l3_a": 1.8,
             "voltage_sag_l1_count": 2.0,
+            "voltage_sag_l2_count": 2.0,
+            "voltage_sag_l3_count": 2.0,
             "voltage_swell_l1_count": 1.0,
+            "voltage_swell_l2_count": 1.0,
+            "voltage_swell_l3_count": 1.0,
             "any_power_fail_count": 5.0,
             "long_power_fail_count": 0.0,
             "total_gas_m3": 567.890,
@@ -163,11 +218,22 @@ mod tests {
         assert_eq!(data.total_power_export_t1_kwh, 60.789);
         assert_eq!(data.total_power_export_t2_kwh, 28.223);
         assert_eq!(data.active_power_w, 1500.0);
-        assert_eq!(data.active_power_l1_w, 1500.0);
+        assert_eq!(data.active_power_l1_w, 750.0);
+        assert_eq!(data.active_power_l2_w, 500.0);
+        assert_eq!(data.active_power_l3_w, 250.0);
+        assert_eq!(data.active_voltage_l1_v, 230.0);
+        assert_eq!(data.active_voltage_l2_v, 230.0);
+        assert_eq!(data.active_voltage_l3_v, 230.0);
         assert_eq!(data.active_current_a, 6.8);
-        assert_eq!(data.active_current_l1_a, 6.8);
+        assert_eq!(data.active_current_l1_a, 4.0);
+        assert_eq!(data.active_current_l2_a, 1.0);
+        assert_eq!(data.active_current_l3_a, 1.8);
         assert_eq!(data.voltage_sag_l1_count, 2.0);
+        assert_eq!(data.voltage_sag_l2_count, 2.0);
+        assert_eq!(data.voltage_sag_l3_count, 2.0);
         assert_eq!(data.voltage_swell_l1_count, 1.0);
+        assert_eq!(data.voltage_swell_l2_count, 1.0);
+        assert_eq!(data.voltage_swell_l3_count, 1.0);
         assert_eq!(data.any_power_fail_count, 5.0);
         assert_eq!(data.long_power_fail_count, 0.0);
         assert_eq!(data.total_gas_m3, 567.890);
@@ -200,11 +266,22 @@ mod tests {
             "total_power_export_t1_kwh": 6.0,
             "total_power_export_t2_kwh": 4.0,
             "active_power_w": 500.0,
-            "active_power_l1_w": 500.0,
+            "active_power_l1_w": 200.0,
+            "active_power_l2_w": 200.0,
+            "active_power_l3_w": 100.0,
+            "active_voltage_l1_v": 230.0,
+            "active_voltage_l2_v": 230.0,
+            "active_voltage_l3_v": 230.0,
             "active_current_a": 2.3,
-            "active_current_l1_a": 2.3,
+            "active_current_l1_a": 1.0,
+            "active_current_l2_a": 1.0,
+            "active_current_l3_a": 0.3,
             "voltage_sag_l1_count": 0.0,
+            "voltage_sag_l2_count": 0.0,
+            "voltage_sag_l3_count": 0.0,
             "voltage_swell_l1_count": 0.0,
+            "voltage_swell_l2_count": 0.0,
+            "voltage_swell_l3_count": 0.0,
             "any_power_fail_count": 0.0,
             "long_power_fail_count": 0.0,
             "total_gas_m3": 50.0,
@@ -262,11 +339,22 @@ mod tests {
             total_power_export_t1_kwh: 6.0,
             total_power_export_t2_kwh: 4.0,
             active_power_w: 500.0,
-            active_power_l1_w: 500.0,
+            active_power_l1_w: 200.0,
+            active_power_l2_w: 200.0,
+            active_power_l3_w: 100.0,
+            active_voltage_l1_v: 230.0,
+            active_voltage_l2_v: 230.0,
+            active_voltage_l3_v: 230.0,
             active_current_a: 2.3,
-            active_current_l1_a: 2.3,
+            active_current_l1_a: 1.0,
+            active_current_l2_a: 1.0,
+            active_current_l3_a: 0.3,
             voltage_sag_l1_count: 0.0,
+            voltage_sag_l2_count: 0.0,
+            voltage_sag_l3_count: 0.0,
             voltage_swell_l1_count: 0.0,
+            voltage_swell_l2_count: 0.0,
+            voltage_swell_l3_count: 0.0,
             any_power_fail_count: 0.0,
             long_power_fail_count: 0.0,
             total_gas_m3: 50.0,
@@ -340,11 +428,22 @@ mod tests {
             "total_power_export_t1_kwh": 60.789,
             "total_power_export_t2_kwh": 28.223,
             "active_power_w": 1500.0,
-            "active_power_l1_w": 1500.0,
+            "active_power_l1_w": 750.0,
+            "active_power_l2_w": 500.0,
+            "active_power_l3_w": 250.0,
+            "active_voltage_l1_v": 230.0,
+            "active_voltage_l2_v": 230.0,
+            "active_voltage_l3_v": 230.0,
             "active_current_a": 6.8,
-            "active_current_l1_a": 6.8,
+            "active_current_l1_a": 4.0,
+            "active_current_l2_a": 1.0,
+            "active_current_l3_a": 1.8,
             "voltage_sag_l1_count": 2.0,
+            "voltage_sag_l2_count": 2.0,
+            "voltage_sag_l3_count": 2.0,
             "voltage_swell_l1_count": 1.0,
+            "voltage_swell_l2_count": 1.0,
+            "voltage_swell_l3_count": 1.0,
             "any_power_fail_count": 5.0,
             "long_power_fail_count": 0.0,
             "total_gas_m3": 567.890,
@@ -427,10 +526,10 @@ mod tests {
         assert!(result.is_err());
 
         match result.unwrap_err() {
-            HomeWizardError::RequestFailed(_) => {
-                // This is expected for JSON parsing errors
+            HomeWizardError::ParseError(msg) => {
+                assert!(msg.contains("JSON decode error"));
             }
-            _ => panic!("Expected RequestFailed error"),
+            _ => panic!("Expected ParseError for malformed JSON"),
         }
     }
 
@@ -511,10 +610,10 @@ mod tests {
         assert!(result.is_err());
 
         match result.unwrap_err() {
-            HomeWizardError::RequestFailed(_) => {
-                // This is expected for missing fields
+            HomeWizardError::ParseError(msg) => {
+                assert!(msg.contains("JSON decode error"));
             }
-            _ => panic!("Expected RequestFailed error"),
+            _ => panic!("Expected ParseError for missing fields"),
         }
     }
 
