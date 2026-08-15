@@ -40,7 +40,9 @@ jobs:
         fail_ci_if_error: false
 
   build:
-    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    runs-on: [self-hosted, husker, microvm]
+    timeout-minutes: 15
     needs: test
     steps:
     - uses: actions/checkout@v4

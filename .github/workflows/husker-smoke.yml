@@ -1,0 +1,33 @@
+name: Husker smoke
+
+run-name: Husker smoke ${{ inputs.nonce }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      nonce:
+        description: Unique fleet-smoke correlation value
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: [self-hosted, husker, microvm]
+    timeout-minutes: 10
+    steps:
+      - name: Prove the ephemeral runner is usable
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = Linux
+          rustc --version
+          {
+            echo "### Husker runner proof"
+            echo
+            echo "- Runner: \`${RUNNER_NAME}\`"
+            echo "- Correlation: \`${{ inputs.nonce }}\`"
+            echo "- Rust: \`$(rustc --version)\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
