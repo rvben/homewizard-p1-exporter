@@ -1,8 +1,12 @@
 name: Husker smoke
 
-run-name: Husker smoke ${{ inputs.nonce }}
+run-name: Husker smoke ${{ inputs.nonce || github.event_name }}
 
 on:
+  schedule:
+    # Daily lifecycle proof. The one-shot runner must execute this job and the
+    # Husker service reconciler must replace it afterward.
+    - cron: '17 04 * * *'
   workflow_dispatch:
     inputs:
       nonce:
@@ -20,14 +24,23 @@ jobs:
     steps:
       - name: Prove the ephemeral runner is usable
         shell: bash
+        env:
+          CORRELATION: ${{ inputs.nonce || format('scheduled-{0}', github.run_id) }}
         run: |
           set -euo pipefail
           test "$(uname -s)" = Linux
-          rustc --version
+          test -r /etc/husker-runner-image
+          # shellcheck disable=SC1091
+          source /etc/husker-runner-image
+          actual_rust="$(rustc --version | awk '{print $2}')"
+          actual_runner="$(/opt/actions-runner/bin/Runner.Listener --version)"
+          test "${actual_rust}" = "${RUST_TOOLCHAIN_VERSION}"
+          test "${actual_runner}" = "${ACTIONS_RUNNER_VERSION}"
           {
             echo "### Husker runner proof"
             echo
             echo "- Runner: \`${RUNNER_NAME}\`"
-            echo "- Correlation: \`${{ inputs.nonce }}\`"
+            echo "- Correlation: \`${CORRELATION}\`"
+            echo "- Actions runner: \`${actual_runner}\`"
             echo "- Rust: \`$(rustc --version)\`"
           } >> "${GITHUB_STEP_SUMMARY}"
