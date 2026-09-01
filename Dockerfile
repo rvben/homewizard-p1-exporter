@@ -1,5 +1,5 @@
 # Build stage - use the target platform's rust image
-FROM rust:1.90-alpine AS builder
+FROM rust:1.98-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache musl-dev
@@ -17,7 +17,7 @@ RUN cargo build --release --target $(rustc -vV | sed -n 's/host: //p') && \
     cp target/$(rustc -vV | sed -n 's/host: //p')/release/homewizard-p1-exporter /app/homewizard-p1-exporter
 
 # Runtime stage
-FROM alpine:3.22
+FROM alpine:3.24
 
 # OCI labels for GitHub Container Registry
 LABEL org.opencontainers.image.source=https://github.com/rvben/homewizard-p1-exporter
