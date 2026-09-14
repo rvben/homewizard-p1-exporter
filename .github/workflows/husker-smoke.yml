@@ -34,13 +34,37 @@ jobs:
           source /etc/husker-runner-image
           actual_rust="$(rustc --version | awk '{print $2}')"
           actual_runner="$(/opt/actions-runner/bin/Runner.Listener --version)"
+
+          # Rust is never self-updated, so this stays an exact match.
           test "${actual_rust}" = "${RUST_TOOLCHAIN_VERSION}"
-          test "${actual_runner}" = "${ACTIONS_RUNNER_VERSION}"
+
+          # GitHub mandates an Actions runner self-update at job start,
+          # independent of whatever version is baked into the golden image, so
+          # the running runner only needs to be at least as new as the pin.
+          # An older running runner is still a real regression and must fail.
+          version_re='^[0-9]+\.[0-9]+\.[0-9]+$'
+          [[ "${ACTIONS_RUNNER_VERSION:-}" =~ $version_re ]] || {
+            echo "::error::baked ACTIONS_RUNNER_VERSION '${ACTIONS_RUNNER_VERSION:-}' is missing or malformed"
+            exit 1
+          }
+          [[ "${actual_runner:-}" =~ $version_re ]] || {
+            echo "::error::running actions runner version '${actual_runner:-}' is missing or malformed"
+            exit 1
+          }
+          oldest="$(printf '%s\n%s\n' "${ACTIONS_RUNNER_VERSION}" "${actual_runner}" | sort -V | head -n1)"
+          if [ "${oldest}" != "${ACTIONS_RUNNER_VERSION}" ]; then
+            echo "::error::running actions runner ${actual_runner} is older than the baked pin ${ACTIONS_RUNNER_VERSION}"
+            exit 1
+          fi
+          if [ "${actual_runner}" != "${ACTIONS_RUNNER_VERSION}" ]; then
+            echo "::notice::actions runner self-updated to ${actual_runner}; the baked image pin (${ACTIONS_RUNNER_VERSION}) is behind"
+          fi
+
           {
             echo "### Husker runner proof"
             echo
             echo "- Runner: \`${RUNNER_NAME}\`"
             echo "- Correlation: \`${CORRELATION}\`"
-            echo "- Actions runner: \`${actual_runner}\`"
+            echo "- Actions runner: \`${actual_runner}\` (baked: \`${ACTIONS_RUNNER_VERSION}\`)"
             echo "- Rust: \`$(rustc --version)\`"
           } >> "${GITHUB_STEP_SUMMARY}"
